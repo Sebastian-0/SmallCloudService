@@ -1,0 +1,114 @@
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/codeStyleConfig.xml
+
+# Generated files
+.idea/**/contentModel.xml
+
+# Sensitive or high-churn files
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+.idea/
+
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+.gradle/
+build/
+
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+.idea/modules.xml
+.idea/*.iml
+.idea/modules
+
+# CMake
+cmake-build-*/
+
+# Mongo Explorer plugin
+.idea/**/mongoSettings.xml
+
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Cursive Clojure plugin
+.idea/replstate.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Editor-based Rest Client
+.idea/httpRequests
+
+# Android studio 3.1+ serialized cache file
+.idea/caches/build_file_checksums.ser
+
+# Windows stuff
+Thumbs.db
+
+#
+# For the Svelte web app
+#
+.DS_Store
+.nyc_output
+.vscode
+node_modules
+*.map
+/src/compiler/compile/internal_exports.ts
+/compiler.d.ts
+/compiler.*js
+/index.*js
+/internal
+/store
+/easing
+/motion
+/transition
+/animate
+/scratch/
+/coverage/
+/coverage.lcov
+/test/*/samples/_
+/yarn-error.log
+_actual*.*
+_output
+/types
+
+/site/cypress/screenshots/
+/site/__sapper__/
+/site/.env
+/site/.sessions
+/site/static/svelte-app.json
+/site/static/contributors.jpg
+/site/static/workers
+/site/static/organisations
+/site/scripts/svelte-app
+/site/scripts/community
+/site/src/routes/_contributors.js
+/site/src/routes/_components/WhosUsingSvelte.*
