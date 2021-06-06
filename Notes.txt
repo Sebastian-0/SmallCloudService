@@ -1,0 +1,6 @@
+ 
+Use "npm ci" instead of install in GitHub actions to use package json file
+
+Questions:
+- How to transition out of hover?
+- Tint with relative color?
