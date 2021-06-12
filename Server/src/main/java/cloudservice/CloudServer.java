@@ -17,14 +17,12 @@ public class CloudServer {
 		Server server = new Server(8080);
 
 		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-		servletContextHandler.setContextPath("/api");
-		servletContextHandler.addServlet(new ServletHolder("root-servlet", new ServletContainer(new ApiResourceConfig())), "/*");
+		servletContextHandler.addServlet(new ServletHolder("root-servlet", new ServletContainer(new ApiResourceConfig())), "/api/*");
+		servletContextHandler.addFilter(CrossOriginFilter.class, "/*", null);
 
 		HandlerList handlerList = new HandlerList();
 		handlerList.addHandler(servletContextHandler);
 		handlerList.addHandler(new DefaultHandler());
-
-		servletContextHandler.addFilter(CrossOriginFilter.class, "/*", null);
 
 		server.setHandler(handlerList);
 
