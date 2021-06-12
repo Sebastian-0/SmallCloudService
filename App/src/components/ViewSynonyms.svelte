@@ -1,14 +1,32 @@
 
 <script type="ts">
+    import * as Constants from './Constants.ts';
+
 	let searchPhrase = "";
+	let searchError = undefined;
 	let searchResult = search();
+
 
 	async function search() : Promise<string[]> {
 		if (searchPhrase.length) {
-			// Send search request
-			return new Promise((resolve, reject) => { resolve(["a", "b", "c"]); })
+			try {
+				const response = await fetch(`http://localhost:8080/api/synonyms?word=${searchPhrase}`);
+				if (response.ok) {
+					searchError = undefined;
+					return response.json();
+				} else {
+					const text = await response.text();
+					console.error("Unexpected error when searching: " + text);
+					searchError = response.statusText + " (see the log for details)";
+				}
+			} catch (error) {
+				console.error("Unexpected error when searching: " + error.message);
+				searchError = "Service unavailable (see the log for details)";
+			}
+		} else {
+			searchError = undefined;
 		}
-		return new Promise((resolve, reject) => { resolve([]); });
+		return Promise.resolve([]);
 	}
  
 	function searchPhraseChanged() {
@@ -24,9 +42,11 @@
 <div>
 	<h1>View synonyms</h1>
 
-	<input type="text" placeholder="Search for a synonym" bind:value={searchPhrase} on:input={searchPhraseChanged}>
+	<input type="text" placeholder="Search for a synonym" maxlength="{Constants.maxSynonymLength}" bind:value={searchPhrase} on:input={searchPhraseChanged}>
 
-	{#await searchResult then result}
+	{#await searchResult}
+		<div/> <!-- Empty div to make spacing correct before the result is loaded -->
+	{:then result}
 		<div class="search-result">
 			{#each result as synonym}
 				<div class="synonym">
@@ -35,8 +55,13 @@
 			{/each}
 		</div>
 	{:catch error}
-		<p>There was an error: {error.message}</p>
+		<p class="error-message">There was an unexpected error: {error.message}</p>
 	{/await}
+
+
+    {#if searchError}
+		<p class="error-message">Failed to publish synonyms: <br/> {searchError}</p>
+    {/if}
 </div>
 
 

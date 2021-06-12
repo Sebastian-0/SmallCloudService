@@ -1,9 +1,14 @@
 
 <script lang="ts">
-    let synonyms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y'];
+    import * as Constants from './Constants.ts';
+
+    // let synonyms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y'];
+    let synonyms = [];
 
     let currentSynonymText = "";
     $: canPublish = synonyms.length > 1;
+
+    let publishError = undefined;
 
     function deleteSynonym(idx: number) {
         synonyms = [...synonyms.slice(0, idx), ...synonyms.slice(idx + 1)]
@@ -17,10 +22,30 @@
         }
     }
 
-    function publish() {
+    async function publish() {
         console.log("Publish to remote: " + synonyms);
-        // Send publish request
-        synonyms = [];
+        try {
+            const response = await fetch(`http://localhost:8080/api/synonyms?word=${synonyms[0]}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(synonyms)
+            });
+
+            if (response.ok) {
+                synonyms = [];
+                currentSynonymText = "";
+                publishError = undefined;
+            } else {
+                const text = await response.text();
+                console.error("Unexpected error when publishing: " + text);
+                publishError = response.statusText + " (see the log for details)";
+            }
+        } catch (error) {
+            console.error("Unexpected error when publishing: " + error.message);
+            publishError = "Service unavailable (see the log for details)";
+        }
     }
 </script>
 
@@ -43,12 +68,16 @@
     </div>
 
     <form on:submit|preventDefault={addSynonym}>
-        <input type="text" placeholder="Add synonym" bind:value={currentSynonymText}>
+        <input type="text" placeholder="Add synonym" maxlength="{Constants.maxSynonymLength}" bind:value={currentSynonymText}>
     </form>
 
     <button on:click={publish} disabled={!canPublish}>
         Publish
     </button>
+
+    {#if publishError}
+        <p class="error-message">Failed to publish synonyms: <br/> {publishError}</p>
+    {/if}
 </div>
 
 <style>

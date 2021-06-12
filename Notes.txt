@@ -4,3 +4,17 @@ Use "npm ci" instead of install in GitHub actions to use package json file
 Questions:
 - How to transition out of hover?
 - Tint with relative color?
+
+TODO:
+-----
+
+Viktigt:
+- Deploy to AWS
+
+Mindre viktigt:
+- Separat synonym-fält
+- Bokstavssortering på resultat
+- Paginering?
+- Diskskrivning i servern?
+- Tvinga lowercase i backend
+- Feedback när man försöker skapa en synonym som redan finns!
