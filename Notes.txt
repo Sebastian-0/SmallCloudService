@@ -10,8 +10,10 @@ TODO:
 
 Viktigt:
 - Deploy to AWS
+- Prestandatest?
 
 Mindre viktigt:
+- Server clean shutdown
 - Separat synonym-fält
 - Bokstavssortering på resultat
 - Paginering?

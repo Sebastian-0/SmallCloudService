@@ -47,6 +47,9 @@ public class CloudServer {
 	}
 
 	public static void main(String[] args) throws Exception {
+		if (args.length > 0) {
+			System.getenv().put("PORT", args[0]);
+		}
 		new CloudServer().run();
 	}
 }

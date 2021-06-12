@@ -8,3 +8,5 @@ Research for maybe 1-2h
 Sat 5/6:
 Research maybe 1-2h
 Create Intellij project
+
+This file is now very much out of date

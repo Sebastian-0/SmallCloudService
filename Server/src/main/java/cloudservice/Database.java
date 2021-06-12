@@ -2,6 +2,7 @@ package cloudservice;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableSet;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -46,7 +47,9 @@ public class Database {
 	private final Lock readLock = lock.readLock();
 	private final Lock writeLock = lock.writeLock();
 
-	private final Map<String, Node> wordToNode = new LinkedHashMap<>();
+	private final Map<String, DataNode> wordToNode = new LinkedHashMap<>();
+	private final Map<String, Entry> wordToEntry = new LinkedHashMap<>();
+
 
 	/**
 	 * Add new synonyms, this method will lock the database from reads during the operation.
@@ -54,18 +57,30 @@ public class Database {
 	public void addSynonyms(String word, Set<String> synonyms) {
 		writeLock.lock();
 		try {
-			Node wordNode = getNode(word);
+			DataNode wordNode = getNode(word);
 			for (String synonym : synonyms) {
-				Node synonymNode = getNode(synonym);
+				DataNode synonymNode = getNode(synonym);
 				wordNode.union(synonymNode);
 			}
+
+			Entry oldEntry = wordToEntry.get(word);
+			Entry newEntry;
+			if (oldEntry != null) {
+				ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+				builder.addAll(oldEntry.synonyms);
+				builder.addAll(synonyms);
+				newEntry = new Entry(word, builder.build());
+			} else {
+				newEntry = new Entry(word, ImmutableSet.copyOf(synonyms));
+			}
+			wordToEntry.put(word, newEntry);
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
-	private Node getNode(String word) {
-		return wordToNode.computeIfAbsent(word, k -> new Node(word));
+	private DataNode getNode(String word) {
+		return wordToNode.computeIfAbsent(word, k -> new DataNode(word));
 	}
 
 	/**
@@ -75,7 +90,7 @@ public class Database {
 	public SynonymPage getSynonyms(String word, int limit) {
 		readLock.lock();
 		try {
-			Node node = wordToNode.get(word);
+			DataNode node = wordToNode.get(word);
 			if (node == null) {
 				return new SynonymPage(0, ImmutableList.of());
 			}
@@ -96,14 +111,23 @@ public class Database {
 		}
 	}
 
+	public List<Entry> getAllEntries() {
+		readLock.lock();
+		try {
+			return new ArrayList<>(wordToEntry.values());
+		} finally {
+			readLock.unlock();
+		}
+	}
+
 	/**
 	 * This data structure uses Union-Find to merge groups of synonyms. The twist is that we also want to keep track
 	 * of the complete set of synonyms included in the group to speed up queries.
 	 */
-	private static class Node {
+	private static class DataNode {
 		private static final Collator COLLATOR;
 
-		private Node parent;
+		private DataNode parent;
 		private int rank;
 
 		private List<String> members;
@@ -113,22 +137,22 @@ public class Database {
 			COLLATOR.setStrength(Collator.PRIMARY);
 		}
 
-		public Node(String text) {
+		public DataNode(String text) {
 			parent = this;
 			rank = 1;
 			members = ImmutableList.of(text);
 		}
 
-		public Node find() {
+		public DataNode find() {
 			if (parent != this) {
 				parent = parent.find();
 			}
 			return parent;
 		}
 
-		public void union(Node other) {
-			Node n1 = find();
-			Node n2 = other.find();
+		public void union(DataNode other) {
+			DataNode n1 = find();
+			DataNode n2 = other.find();
 
 			if (n1 == n2) {
 				return;
@@ -144,7 +168,7 @@ public class Database {
 			}
 		}
 
-		private void merge(Node source, Node target) {
+		private void merge(DataNode source, DataNode target) {
 			source.parent = target;
 			target.members = mergeLists(target.members, source.members);
 			source.members = ImmutableList.of();
@@ -200,6 +224,17 @@ public class Database {
 
 		public SynonymPage(int total, List<String> synonyms) {
 			this.total = total;
+			this.synonyms = synonyms;
+		}
+	}
+
+	/** Immutable entry */
+	public static class Entry {
+		public final String word;
+		public final Set<String> synonyms;
+
+		public Entry(String word, Set<String> synonyms) {
+			this.word = word;
 			this.synonyms = synonyms;
 		}
 	}

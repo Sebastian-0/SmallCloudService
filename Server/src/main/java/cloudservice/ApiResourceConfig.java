@@ -13,9 +13,13 @@ public class ApiResourceConfig extends ResourceConfig {
 			@Override
 			protected void configure() {
 				bind(Database.class).to(Database.class).in(Singleton.class);
+				bind(Cluster.class).to(Cluster.class).in(Singleton.class);
+				bind(Synchronizer.class).to(Synchronizer.class).in(Singleton.class);
 			}
 		});
 
 		register(SynonymResource.class);
+		register(SynchronizationResource.class);
+		register(ClusterDefinitionResource.class);
 	}
 }

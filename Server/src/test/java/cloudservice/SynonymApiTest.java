@@ -34,6 +34,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void addMissingWordArgument() {
+		defineCluster();
+
 		Response response = addSynonyms("", ImmutableSet.of());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Missing 'word' argument"),
@@ -42,6 +44,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void addMissingBody() {
+		defineCluster();
+
 		Response response = addSynonyms("a", null);
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Missing synonym list body"),
@@ -56,6 +60,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	@ParameterizedTest
 	@ValueSource(strings = {" ", "", "\t", "\n"})
 	void addBadBody(String badSynonym) {
+		defineCluster();
+
 		Response response = addSynonyms("a", ImmutableSet.of("a", "b", badSynonym));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Body contains synonym which is null or empty"),
@@ -64,6 +70,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void addAndGet() {
+		defineCluster();
+
 		addSynonyms("a", ImmutableSet.of("b", "c", "d"));
 		SynonymPage synonymPage = getSynonyms("a", 10);
 		assertEquals(3, synonymPage.total);
@@ -72,6 +80,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void addAndGetTransitive() {
+		defineCluster();
+
 		addSynonyms("a", ImmutableSet.of("b"));
 		addSynonyms("b", ImmutableSet.of("c"));
 
@@ -90,6 +100,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void getMissingWordArgument() {
+		defineCluster();
+
 		BadRequestException exception = assertThrows(BadRequestException.class, () -> getSynonyms("", 10));
 		assertTrue(exception.getMessage().contains("Missing 'word' argument"), "Was: " + exception.getMessage());
 	}
@@ -97,6 +109,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	@ParameterizedTest
 	@ValueSource(ints = {-1, 0})
 	void getWithInvalidLimit(int badLimit) {
+		defineCluster();
+
 		BadRequestException exception = assertThrows(BadRequestException.class, () -> getSynonyms("a", badLimit));
 		assertTrue(exception.getMessage().contains("The 'limit' must be larger than 0 but was " + badLimit),
 				"Was: " + exception.getMessage());
@@ -104,6 +118,8 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 
 	@Test
 	void getWithPagination() {
+		defineCluster();
+
 		addSynonyms("a", ImmutableSet.of("b", "c", "d"));
 
 		SynonymPage synonymPage = getSynonyms("a", 1);
@@ -117,6 +133,13 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 		synonymPage = getSynonyms("a", 3);
 		assertEquals(3, synonymPage.total);
 		assertEquals(ImmutableList.of("b", "c", "d"), synonymPage.synonyms);
+	}
+
+	private void defineCluster() {
+		target().path("cluster")
+				.queryParam("thisInstance", "localhost:" + getPort())
+				.request()
+				.post(Entity.json(ImmutableList.of("localhost:" + getPort())));
 	}
 
 	private Response addSynonyms(String word, Set<String> synonyms) {
