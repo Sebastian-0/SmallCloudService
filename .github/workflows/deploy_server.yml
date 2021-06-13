@@ -1,0 +1,52 @@
+name: Deploy server
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: 'Git ref to use'
+        required: false
+        default: ''
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{github.event.input.git-ref}}
+        fetch-depth: 0
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Build & test
+      run: ./gradlew clean build
+      
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
+        aws-region: "eu-west-1"
+        
+    - name: Upload package to S3
+      run: aws s3 cp Server/build/Server-1.0-SNAPSHOT.zip s3://${{ secrets.AWS_S3_SERVER_BUCKET }}/
+
+    - name: Create new application version
+      run: |
+        aws elasticbeanstalk create-application-version \
+        --application-name "${{ secrets.AWS_EB_APPLICATION_NAME }}"  \
+        --source-bundle S3Bucket="${{ secrets.AWS_S3_SERVER_BUCKET }}",S3Key="Server-1.0-SNAPSHOT.zip" \
+        --version-label "ver-${{ github.sha }}" \
+        --description "commit-sha-${{ github.sha }}"
+    - name: Deploy new application version
+      run: |
+        aws elasticbeanstalk update-environment \
+        --environment-name "${{ secrets.AWS_EB_ENVIRONMENT_NAME }}" \
+        --version-label "ver-${{ github.sha }}"
+   
