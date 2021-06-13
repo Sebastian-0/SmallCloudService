@@ -3,9 +3,8 @@
     import { maxSynonymLength, serviceUrl } from './Constants';
 
 	let searchPhrase = "";
+	let searchResult = [];
 	let searchError = undefined;
-	let searchResult : string[] = [];
-
 
 	async function search() {
 		if (searchPhrase.length) {

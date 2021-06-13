@@ -6,27 +6,30 @@
     let synonyms = [];
 
     let currentWordText = "";
-
     let currentSynonymText = "";
-    $: canPublish = synonyms.length > 0 && word.length > 0;
 
+    $: canPublish = synonyms.length > 0 && word.length > 0;
     let publishError = undefined;
 
     function deleteSynonym(idx: number) {
         synonyms = [...synonyms.slice(0, idx), ...synonyms.slice(idx + 1)]
     }
 
-    function addSynonym(event: Event) {
-        const lowercaseText = currentSynonymText.toLowerCase();
-        if (lowercaseText.length && synonyms.indexOf(lowercaseText) === -1 && lowercaseText !== word) {
-            synonyms = [...synonyms, lowercaseText];
+    function addSynonym() {
+        const sanitizedText = sanitizeWord(currentSynonymText);
+        if (sanitizedText.length > 0 && synonyms.indexOf(sanitizedText) === -1 && sanitizedText !== word) {
+            synonyms = [...synonyms, sanitizedText];
             currentSynonymText = "";
         }
     }
 
     function setWord() {
-        word = currentWordText.toLowerCase();
+        word = sanitizeWord(currentWordText);
         currentWordText = "";
+    }
+
+    function sanitizeWord(word: string) {
+        return word.trim().toLowerCase();
     }
 
     function clearWord() {
@@ -63,7 +66,7 @@
 
 <div>
 	<h1>Add synonyms</h1>
-    {#if word.length == 0}
+    {#if word.length === 0}
         <p>No word to publish yet...</p>
 
         <form on:submit|preventDefault={setWord}>
@@ -81,7 +84,7 @@
 
     <div class="list-horizontal">
         {#each synonyms as synonym, idx}
-            <button class="synonym" on:click={ event => deleteSynonym(idx) }>
+            <button class="synonym" on:click={ e => deleteSynonym(idx) }>
                 {synonym}
 
                 <div class="synonym-overlay">
