@@ -1,6 +1,6 @@
 
 <script type="ts">
-    import * as Constants from './Constants.ts';
+    import { maxSynonymLength, serviceUrl } from './Constants';
 
 	let searchPhrase = "";
 	let searchError = undefined;
@@ -10,7 +10,7 @@
 	async function search() : Promise<string[]> {
 		if (searchPhrase.length) {
 			try {
-				const response = await fetch(`http://localhost:8080/api/synonyms?word=${searchPhrase}`);
+				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase}`);
 				if (response.ok) {
 					searchError = undefined;
 					return response.json();
@@ -42,7 +42,7 @@
 <div>
 	<h1>View synonyms</h1>
 
-	<input type="text" placeholder="Search for a synonym" maxlength="{Constants.maxSynonymLength}" bind:value={searchPhrase} on:input={searchPhraseChanged}>
+	<input type="text" placeholder="Search for a synonym" maxlength="{maxSynonymLength}" bind:value={searchPhrase} on:input={searchPhraseChanged}>
 
 	{#await searchResult}
 		<div/> <!-- Empty div to make spacing correct before the result is loaded -->

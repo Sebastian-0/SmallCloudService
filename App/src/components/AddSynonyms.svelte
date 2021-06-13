@@ -1,6 +1,6 @@
 
 <script lang="ts">
-    import * as Constants from './Constants.ts';
+    import { maxSynonymLength, serviceUrl } from './Constants';
 
     // let synonyms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y'];
     let synonyms = [];
@@ -25,7 +25,7 @@
     async function publish() {
         console.log("Publish to remote: " + synonyms);
         try {
-            const response = await fetch(`http://localhost:8080/api/synonyms?word=${synonyms[0]}`, {
+            const response = await fetch(`${serviceUrl}/api/synonyms?word=${synonyms[0]}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@
     </div>
 
     <form on:submit|preventDefault={addSynonym}>
-        <input type="text" placeholder="Add synonym" maxlength="{Constants.maxSynonymLength}" bind:value={currentSynonymText}>
+        <input type="text" placeholder="Add synonym" maxlength="{maxSynonymLength}" bind:value={currentSynonymText}>
     </form>
 
     <button on:click={publish} disabled={!canPublish}>
