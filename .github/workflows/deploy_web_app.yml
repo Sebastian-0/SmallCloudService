@@ -9,7 +9,7 @@ on:
         default: ''
 
 jobs:
-  Build-and-deploy:
+  Build-and-Deploy:
     runs-on: ubuntu-latest
 
     steps:

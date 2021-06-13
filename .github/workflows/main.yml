@@ -22,7 +22,7 @@ jobs:
       with:
         java-version: 11
 
-    - name: Build & test
+    - name: Build & Test
       run: ./gradlew clean build
 
   Build-App:
