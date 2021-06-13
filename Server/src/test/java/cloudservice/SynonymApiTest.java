@@ -1,5 +1,6 @@
 package cloudservice;
 
+import cloudservice.util.JUnit5JerseyTest;
 import com.google.common.collect.ImmutableSet;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.client.Entity;

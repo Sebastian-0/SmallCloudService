@@ -1,4 +1,4 @@
-package cloudservice;
+package cloudservice.util;
 
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
