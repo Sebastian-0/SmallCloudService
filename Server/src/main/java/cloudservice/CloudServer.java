@@ -27,8 +27,16 @@ public class CloudServer {
 		server.setHandler(handlerList);
 
 		server.start();
-
 		LOGGER.info("Server started...");
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			LOGGER.info("Shutting down...");
+			try {
+				server.stop();
+			} catch (Exception e) {
+				LOGGER.error("Failed to stop the Jetty server");
+			}
+		}));
 	}
 
 	public static void main(String[] args) throws Exception {
