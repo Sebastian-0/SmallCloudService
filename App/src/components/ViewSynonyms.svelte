@@ -3,8 +3,19 @@
     import { maxSynonymLength, serviceUrl } from './Constants';
 	import { sanitizeWord } from './Utils';
 
+	class SynonymPage {
+		total: number;
+		synonyms: string[];
+
+		constructor() {
+			this.total = 0;
+			this.synonyms = [];
+		}
+	}
+
+	let pageLimit;
 	let searchPhrase = "";
-	let searchResult = [];
+	let searchResult = new SynonymPage();
 	
 	let currentSearchPhraseText = "";
 
@@ -15,7 +26,7 @@
 		if (searchPhrase.length) {
 			console.log(`Search for ${searchPhrase}`)
 			try {
-				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase.toLowerCase()}`);
+				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase.toLowerCase()}&limit=${pageLimit}`);
 				if (response.ok) {
 					searchError = undefined;
 					searchResult = await response.json();
@@ -30,17 +41,23 @@
 			}
 		} else {
 			searchError = undefined;
-			searchResult = []
+			searchResult = new SynonymPage();
 		}
 	}
 
 	function search() {
 		const sanitized = sanitizeWord(currentSearchPhraseText);
 		if (sanitized !== searchPhrase) {
+			pageLimit = 100;
 			searchPhrase = sanitized;
-			searchResult = []
+			searchResult = new SynonymPage();
 			searchPromise = doSearch();
 		}
+	}
+
+	function increaseLimit() {
+		pageLimit += 100;
+		searchPromise = doSearch();
 	}
 </script>
 
@@ -55,9 +72,9 @@
 	{#await searchPromise}
 		<p>Searching...</p>
 	{:then}
-		{#if searchPhrase.length == 0}
+		{#if searchPhrase.length === 0}
 			<p>Empty search result...</p>
-		{:else if searchResult.length == 0}
+		{:else if searchResult.total === 0}
 			<p>No synonyms found for '{searchPhrase}'</p>
 		{:else}
 			<p>Synonyms for '{searchPhrase}':</p>
@@ -65,15 +82,23 @@
 	{/await}
 	
 	<div class="search-result">
-		{#each searchResult as synonym}
+		{#each searchResult.synonyms as synonym}
 			<div class="synonym">
 				{synonym}
 			</div>
 		{/each}
 	</div>
 
+	<!-- It would be nice to use infinite scroll here but that will have to be another time -->
+	{#if searchResult.total > searchResult.synonyms.length}
+		<div>
+			Showing first {searchResult.synonyms.length} of {searchResult.total}
+			<button on:click="{increaseLimit}">Show more</button>
+		</div>
+	{/if}
+
 	{#if searchError}
-		<p class="error-message">Failed to publish synonyms: <br/> {searchError}</p>
+		<p class="error-message">Failed to search for synonyms: <br/> {searchError}</p>
 	{/if}
 </div>
 

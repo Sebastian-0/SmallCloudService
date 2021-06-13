@@ -37,7 +37,7 @@ public class Database {
 		return wordToNode.computeIfAbsent(word, k -> new Node(word));
 	}
 
-	public List<String> getSynonyms(String word) {
+	public Synonyms getSynonyms(String word, int limit) {
 		readLock.lock();
 		try {
 			List<String> synonyms = ImmutableList.of();
@@ -45,10 +45,17 @@ public class Database {
 			if (node != null) {
 				synonyms = node.find().members;
 			}
+			List<String> result = new ArrayList<>();
+			for (String synonym : synonyms) {
+				if (result.size() == limit) {
+					break;
+				}
 
-			List<String> result = new ArrayList<>(synonyms);
-			result.remove(word);
-			return result;
+				if (!synonym.equals(word)) {
+					result.add(synonym);
+				}
+			}
+			return new Synonyms(synonyms.size() - 1, result);
 		} finally {
 			readLock.unlock();
 		}
@@ -145,6 +152,16 @@ public class Database {
 				}
 			}
 			return builder.build();
+		}
+	}
+
+	public static class Synonyms {
+		public final int total;
+		public final List<String> synonyms;
+
+		public Synonyms(int total, List<String> synonyms) {
+			this.total = total;
+			this.synonyms = synonyms;
 		}
 	}
 }

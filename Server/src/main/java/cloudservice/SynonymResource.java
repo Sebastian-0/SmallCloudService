@@ -1,5 +1,6 @@
 package cloudservice;
 
+import cloudservice.Database.Synonyms;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -7,7 +8,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 
-import java.util.List;
 import java.util.Set;
 
 @Path("synonyms")
@@ -28,10 +28,13 @@ public class SynonymResource {
 	}
 
 	@GET
-	public List<String> list(@QueryParam("word") String word) {
+	public Synonyms list(@QueryParam("word") String word, @QueryParam("limit") int limit) {
 		if (word == null || word.isBlank()) {
-			throw new BadRequestException("Missing word argument");
+			throw new BadRequestException("Missing 'word' argument");
 		}
-		return database.getSynonyms(word);
+		if (limit <= 0) {
+			throw new BadRequestException("The 'limit' must be larger than 0 but was " + limit);
+		}
+		return database.getSynonyms(word, limit);
 	}
 }
