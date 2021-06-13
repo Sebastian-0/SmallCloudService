@@ -3,27 +3,30 @@
 	import ViewSynonyms from './components/ViewSynonyms.svelte';
 </script>
 
-<AddSynonyms/>
+<main>
+	<AddSynonyms/>
 
-<hr/>
+	<hr/>
 
-<ViewSynonyms/>
+	<ViewSynonyms/>
+</main>
 
 <footer>
 	<div>Favicon made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 </footer>
 
 <style>
+	main {
+		/* Use this to expand the main surface so that the footer is in the right place */
+		flex: 1;
+	}
+
 	hr {
 		text-align: center;
 		width: 50%;
 	}
 
 	footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
 		font-size: smaller;
 		color: gray;
 	}

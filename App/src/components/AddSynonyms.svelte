@@ -76,7 +76,7 @@
 			{word}
 
 			<div class="synonym-overlay">
-				<img src="/cross.svg" alt="Delete?" class="synonym-overlay-image">
+				<img src="/cross.svg" class="synonym-overlay-image" alt="Delete?" >
 			</div>
 		</button>
 	{/if}
@@ -87,7 +87,7 @@
 				{synonym}
 
 				<div class="synonym-overlay">
-					<img src="/cross.svg" alt="Delete?" class="synonym-overlay-image">
+					<img src="/cross.svg"class="synonym-overlay-image" alt="Delete?" >
 				</div>
 			</button>
 		{/each}
@@ -111,6 +111,13 @@
 </div>
 
 <style>
+	.list-horizontal {
+		width: 50%;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
 	.synonym-overlay {
 		position: absolute;
 		bottom: 0;
@@ -119,7 +126,6 @@
 		box-sizing: border-box;
 		width: 100%;
 		height: 100%;
-		overflow: hidden;
 
 		background-color: rgb(138, 138, 138);
 		border-radius: inherit;
@@ -141,12 +147,5 @@
 
 	.word {
 		color: rgb(14, 118, 255);
-	}
-
-	.list-horizontal {
-		width: 50%;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
 	}
 </style>
