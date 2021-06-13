@@ -1,0 +1,41 @@
+name: Deploy web app
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: 'Git ref to use'
+        required: false
+        default: ''
+
+jobs:
+  Build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{github.event.input.git-ref}}
+        fetch-depth: 0
+      
+    - name: Set up Node
+      uses: actions/setup-node@v2
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: App
+
+    - name: Build
+      run: npm run build
+      working-directory: App
+      
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_WEB_APP_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_WEB_APP_SECRET_ACCESS_KEY }}
+        aws-region: "eu-west-1"
+        
+    - name: Upload package to S3
+      run: aws s3 sync --delete App/public/ s3://${{ secrets.AWS_S3_WEB_APP_BUCKET }}/
+   
