@@ -40,13 +40,13 @@ public class Database {
 	public Synonyms getSynonyms(String word, int limit) {
 		readLock.lock();
 		try {
-			List<String> synonyms = ImmutableList.of();
 			Node node = wordToNode.get(word);
-			if (node != null) {
-				synonyms = node.find().members;
+			if (node == null) {
+				return new Synonyms(0, ImmutableList.of());
 			}
+			List<String> allSynonyms = node.find().members;
 			List<String> result = new ArrayList<>();
-			for (String synonym : synonyms) {
+			for (String synonym : allSynonyms) {
 				if (result.size() == limit) {
 					break;
 				}
@@ -55,7 +55,7 @@ public class Database {
 					result.add(synonym);
 				}
 			}
-			return new Synonyms(synonyms.size() - 1, result);
+			return new Synonyms(allSynonyms.size() - 1, result);
 		} finally {
 			readLock.unlock();
 		}

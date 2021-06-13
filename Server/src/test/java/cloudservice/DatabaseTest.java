@@ -102,4 +102,11 @@ public class DatabaseTest {
 		assertEquals(3, actual.total);
 		assertEquals(ImmutableList.of(), actual.synonyms);
 	}
+
+	@Test
+	void returnedCountsUnknownWord() {
+		Synonyms actual = database.getSynonyms("x", 10);
+		assertEquals(0, actual.total);
+		assertEquals(ImmutableList.of(), actual.synonyms);
+	}
 }
