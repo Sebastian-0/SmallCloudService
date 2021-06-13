@@ -14,7 +14,7 @@ public class CloudServer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CloudServer.class);
 
 	public void run() throws Exception {
-		Server server = new Server(8080);
+		Server server = new Server(getPort());
 
 		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		servletContextHandler.addServlet(new ServletHolder("root-servlet", new ServletContainer(new ApiResourceConfig())), "/api/*");
@@ -37,6 +37,11 @@ public class CloudServer {
 				LOGGER.error("Failed to stop the Jetty server");
 			}
 		}));
+	}
+
+	private int getPort() {
+		LOGGER.info("Port is: {}", System.getenv().get("PORT"));
+		return Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 	}
 
 	public static void main(String[] args) throws Exception {

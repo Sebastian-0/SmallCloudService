@@ -26,6 +26,10 @@ java {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "failed", "standardError"
+    }
+
 }
 
 task copyToLib( type: Copy ) {
@@ -33,12 +37,17 @@ task copyToLib( type: Copy ) {
     from configurations.runtimeClasspath
 }
 
+task copyProcfile( type: Copy ) {
+    into "$buildDir/libs"
+    from "Procfile"
+}
+
 jar {
     manifest {
-        attributes 'Main-Class':'cloudservice.Server',
+        attributes 'Main-Class':'cloudservice.CloudServer',
                 'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
-    dependsOn copyToLib
+    dependsOn copyToLib, copyProcfile
 }
 
 task packageDistibution(type: Zip) {
