@@ -37,12 +37,12 @@ public class Database {
 		return wordToNode.computeIfAbsent(word, k -> new Node(word));
 	}
 
-	public Synonyms getSynonyms(String word, int limit) {
+	public SynonymPage getSynonyms(String word, int limit) {
 		readLock.lock();
 		try {
 			Node node = wordToNode.get(word);
 			if (node == null) {
-				return new Synonyms(0, ImmutableList.of());
+				return new SynonymPage(0, ImmutableList.of());
 			}
 			List<String> allSynonyms = node.find().members;
 			List<String> result = new ArrayList<>();
@@ -55,12 +55,16 @@ public class Database {
 					result.add(synonym);
 				}
 			}
-			return new Synonyms(allSynonyms.size() - 1, result);
+			return new SynonymPage(allSynonyms.size() - 1, result);
 		} finally {
 			readLock.unlock();
 		}
 	}
 
+	/**
+	 * This data structure uses Union-Find to merge groups of synonyms. The twist is that we also want to keep track
+	 * of the complete set of synonyms included in the group to speed up queries.
+	 */
 	private static class Node {
 		private static final Collator COLLATOR;
 
@@ -155,11 +159,11 @@ public class Database {
 		}
 	}
 
-	public static class Synonyms {
+	public static class SynonymPage {
 		public final int total;
 		public final List<String> synonyms;
 
-		public Synonyms(int total, List<String> synonyms) {
+		public SynonymPage(int total, List<String> synonyms) {
 			this.total = total;
 			this.synonyms = synonyms;
 		}

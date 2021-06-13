@@ -1,6 +1,6 @@
 package cloudservice;
 
-import cloudservice.Database.Synonyms;
+import cloudservice.Database.SynonymPage;
 import cloudservice.util.JUnit5JerseyTest;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -44,9 +44,9 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	@Test
 	void addAndGet() {
 		addSynonyms("a", ImmutableSet.of("b", "c", "d"));
-		Synonyms synonyms = getSynonyms("a", 10);
-		assertEquals(3, synonyms.total);
-		assertEquals(ImmutableList.of("b", "c", "d"), synonyms.synonyms);
+		SynonymPage synonymPage = getSynonyms("a", 10);
+		assertEquals(3, synonymPage.total);
+		assertEquals(ImmutableList.of("b", "c", "d"), synonymPage.synonyms);
 	}
 
 	@Test
@@ -54,17 +54,17 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 		addSynonyms("a", ImmutableSet.of("b"));
 		addSynonyms("b", ImmutableSet.of("c"));
 
-		Synonyms synonyms = getSynonyms("a", 10);
-		assertEquals(2, synonyms.total);
-		assertEquals(ImmutableList.of("b", "c"), synonyms.synonyms);
+		SynonymPage synonymPage = getSynonyms("a", 10);
+		assertEquals(2, synonymPage.total);
+		assertEquals(ImmutableList.of("b", "c"), synonymPage.synonyms);
 
-		synonyms = getSynonyms("b", 10);
-		assertEquals(2, synonyms.total);
-		assertEquals(ImmutableList.of("a", "c"), synonyms.synonyms);
+		synonymPage = getSynonyms("b", 10);
+		assertEquals(2, synonymPage.total);
+		assertEquals(ImmutableList.of("a", "c"), synonymPage.synonyms);
 
-		synonyms = getSynonyms("c", 10);
-		assertEquals(2, synonyms.total);
-		assertEquals(ImmutableList.of("a", "b"), synonyms.synonyms);
+		synonymPage = getSynonyms("c", 10);
+		assertEquals(2, synonymPage.total);
+		assertEquals(ImmutableList.of("a", "b"), synonymPage.synonyms);
 	}
 
 	@ParameterizedTest
@@ -79,17 +79,17 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	void getWithPagination() {
 		addSynonyms("a", ImmutableSet.of("b", "c", "d"));
 
-		Synonyms synonyms = getSynonyms("a", 1);
-		assertEquals(3, synonyms.total);
-		assertEquals(ImmutableList.of("b"), synonyms.synonyms);
+		SynonymPage synonymPage = getSynonyms("a", 1);
+		assertEquals(3, synonymPage.total);
+		assertEquals(ImmutableList.of("b"), synonymPage.synonyms);
 
-		synonyms = getSynonyms("a", 2);
-		assertEquals(3, synonyms.total);
-		assertEquals(ImmutableList.of("b", "c"), synonyms.synonyms);
+		synonymPage = getSynonyms("a", 2);
+		assertEquals(3, synonymPage.total);
+		assertEquals(ImmutableList.of("b", "c"), synonymPage.synonyms);
 
-		synonyms = getSynonyms("a", 3);
-		assertEquals(3, synonyms.total);
-		assertEquals(ImmutableList.of("b", "c", "d"), synonyms.synonyms);
+		synonymPage = getSynonyms("a", 3);
+		assertEquals(3, synonymPage.total);
+		assertEquals(ImmutableList.of("b", "c", "d"), synonymPage.synonyms);
 	}
 
 	private Response addSynonyms(String word, Set<String> synonyms) {
@@ -99,7 +99,7 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 						.post(Entity.json(synonyms));
 	}
 
-	private Synonyms getSynonyms(String word, int limit) {
+	private SynonymPage getSynonyms(String word, int limit) {
 		return target().path("synonyms")
 				.queryParam("word", word)
 				.queryParam("limit", limit)

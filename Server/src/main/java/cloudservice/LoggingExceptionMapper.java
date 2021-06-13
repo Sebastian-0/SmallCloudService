@@ -9,6 +9,9 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class will log any exceptions that occur, as well as improve upon Jetty's error messages.
+ */
 public class LoggingExceptionMapper implements ExceptionMapper<Exception> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExceptionMapper.class);
 

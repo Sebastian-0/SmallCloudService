@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion" // Gson is no longer maintained, should be replaced by e.g. Moshi
     implementation "com.google.guava:guava:$guavaVersion"
 
     implementation "org.eclipse.jetty:jetty-server:$jettyVersion"

@@ -1,6 +1,6 @@
 package cloudservice;
 
-import cloudservice.Database.Synonyms;
+import cloudservice.Database.SynonymPage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,7 +90,7 @@ public class DatabaseTest {
 	void returnedCounts() {
 		database.addSynonyms("a", ImmutableSet.of("b", "c", "d"));
 
-		Synonyms actual = database.getSynonyms("a", 10);
+		SynonymPage actual = database.getSynonyms("a", 10);
 		assertEquals(3, actual.total);
 		assertEquals(ImmutableList.of("b", "c", "d"), actual.synonyms);
 
@@ -105,7 +105,7 @@ public class DatabaseTest {
 
 	@Test
 	void returnedCountsUnknownWord() {
-		Synonyms actual = database.getSynonyms("x", 10);
+		SynonymPage actual = database.getSynonyms("x", 10);
 		assertEquals(0, actual.total);
 		assertEquals(ImmutableList.of(), actual.synonyms);
 	}

@@ -1,6 +1,6 @@
 package cloudservice;
 
-import cloudservice.Database.Synonyms;
+import cloudservice.Database.SynonymPage;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -28,7 +28,7 @@ public class SynonymResource {
 	}
 
 	@GET
-	public Synonyms list(@QueryParam("word") String word, @QueryParam("limit") int limit) {
+	public SynonymPage list(@QueryParam("word") String word, @QueryParam("limit") int limit) {
 		if (word == null || word.isBlank()) {
 			throw new BadRequestException("Missing 'word' argument");
 		}

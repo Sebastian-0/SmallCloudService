@@ -40,7 +40,6 @@ public class CloudServer {
 	}
 
 	private int getPort() {
-		LOGGER.info("Port is: {}", System.getenv().get("PORT"));
 		return Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 	}
 

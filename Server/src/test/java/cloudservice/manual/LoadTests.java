@@ -20,7 +20,9 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 /**
- * These tests assume there is a server running already on 8080 (default port)
+ * These tests are utilities, not normal unit tests.
+ *
+ * They assume there is a server running already on 8080 (default port).
  */
 @Disabled("Comment out this when running load test locally")
 public class LoadTests {

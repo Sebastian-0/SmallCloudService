@@ -17,6 +17,9 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+/**
+ * This class handles JSON serialization/deserialization so I don't have to deal with that explicitly anywhere else.
+ */
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class JsonIO implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
