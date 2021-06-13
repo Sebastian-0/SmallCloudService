@@ -9,7 +9,7 @@
 	async function search() {
 		if (searchPhrase.length) {
 			try {
-				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase}`);
+				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase.toLowerCase()}`);
 				if (response.ok) {
 					searchError = undefined;
 					searchResult = await response.json();
