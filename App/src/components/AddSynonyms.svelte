@@ -6,6 +6,7 @@
 	let word = "";
 	let synonyms = [];
 
+	let synonymInputField;
 	let currentWordText = "";
 	let currentSynonymText = "";
 
@@ -27,6 +28,7 @@
 	function setWord() {
 		word = sanitizeWord(currentWordText);
 		currentWordText = "";
+		synonymInputField.focus();
 	}
 
 	function clearWord() {
@@ -96,7 +98,7 @@
 	</div>
 
 	<form on:submit|preventDefault={addSynonym}>
-		<input type="text" placeholder="Add synonym" maxlength="{maxSynonymLength}" bind:value={currentSynonymText}>
+		<input type="text" placeholder="Add synonym" maxlength="{maxSynonymLength}" bind:value={currentSynonymText} bind:this={synonymInputField}>
 	</form>
 
 	<button on:click={publish} disabled={!canPublish}>
