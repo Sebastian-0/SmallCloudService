@@ -51,12 +51,6 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 		assertEquals(ImmutableSet.of("a", "b"), getSynonyms("c"));
 	}
 
-	@Test
-	void getSorted() {
-		addSynonyms("a", ImmutableSet.of("x", "D", "d", "c", "e", "1"));
-		assertEquals(ImmutableSet.of("1", "c", "D", "d", "e", "x"), getSynonyms("a"));
-	}
-
 	private Response addSynonyms(String word, Set<String> synonyms) {
 		return target().path("synonyms")
 						.queryParam("word", word)
