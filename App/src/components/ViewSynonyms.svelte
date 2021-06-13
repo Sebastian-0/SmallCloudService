@@ -4,6 +4,8 @@
 
 	let searchPhrase = "";
 	let searchResult = [];
+
+	let searchPromise = Promise.resolve();
 	let searchError = undefined;
 
 	async function search() {
@@ -29,8 +31,8 @@
 	}
  
 	function searchPhraseChanged() {
-		let promise = search();
-		promise.then( v => {
+		searchPromise = search();
+		searchPromise.then( v => {
 			console.log(`Search result: ${v}`)
 		});
 		console.log(`Search for ${searchPhrase}`)
@@ -43,11 +45,17 @@
 
 	<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={searchPhrase} on:input={searchPhraseChanged}>
 
-	{#if searchResult.length > 0}
-		<p>Synonyms for {searchPhrase}:</p>
-	{:else}
+	{#await searchPromise}
 		<p>Empty search result...</p>
-	{/if}
+	{:then}
+		{#if searchPhrase.length == 0}
+			<p>Empty search result...</p>
+		{:else if searchResult.length == 0}
+			<p>No synonyms found for '{searchPhrase}'</p>
+		{:else}
+			<p>Synonyms for '{searchPhrase}':</p>
+		{/if}
+	{/await}
 	
 	<div class="search-result">
 		{#each searchResult as synonym}
