@@ -9,14 +9,24 @@ import jakarta.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Path("synonyms")
 public class SynonymResource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SynonymResource.class);
 
+	private final Database database;
+	private final Collator collator;
+
 	@Inject
-	private Database database;
+	public SynonymResource(Database database) {
+		this.database = database;
+		this.collator = Collator.getInstance();
+		collator.setStrength(Collator.PRIMARY);
+	}
 
 	@POST
 	public void add(@QueryParam("word") String word, Set<String> synonyms) {
@@ -28,11 +38,13 @@ public class SynonymResource {
 	}
 
 	@GET
-	public Set<String> list(@QueryParam("word") String word) {
+	public List<String> list(@QueryParam("word") String word) {
 		if (word == null || word.isBlank()) {
 			throw new BadRequestException("Missing word argument");
 		}
-		Set<String> result = database.getSynonyms(word);
+		// Ideally we don't want to duplicate the data by creating a list but it's hard to sort it otherwise
+		List<String> result = new ArrayList<>(database.getSynonyms(word));
+		result.sort(collator);
 		LOGGER.info("Synonyms read: {} -> {}", word, result);
 		return result;
 	}
