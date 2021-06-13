@@ -1,15 +1,19 @@
 
 <script type="ts">
     import { maxSynonymLength, serviceUrl } from './Constants';
+	import { sanitizeWord } from './Utils';
 
 	let searchPhrase = "";
 	let searchResult = [];
+	
+	let currentSearchPhraseText = "";
 
 	let searchPromise = Promise.resolve();
 	let searchError = undefined;
 
-	async function search() {
+	async function doSearch() {
 		if (searchPhrase.length) {
+			console.log(`Search for ${searchPhrase}`)
 			try {
 				const response = await fetch(`${serviceUrl}/api/synonyms?word=${searchPhrase.toLowerCase()}`);
 				if (response.ok) {
@@ -29,13 +33,14 @@
 			searchResult = []
 		}
 	}
- 
-	function searchPhraseChanged() {
-		searchPromise = search();
-		searchPromise.then( v => {
-			console.log(`Search result: ${v}`)
-		});
-		console.log(`Search for ${searchPhrase}`)
+
+	function search() {
+		const sanitized = sanitizeWord(currentSearchPhraseText);
+		if (sanitized !== searchPhrase) {
+			searchPhrase = sanitized;
+			searchResult = []
+			searchPromise = doSearch();
+		}
 	}
 </script>
 
@@ -43,10 +48,12 @@
 <div>
 	<h1>View synonyms</h1>
 
-	<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={searchPhrase} on:input={searchPhraseChanged}>
+	<form on:submit|preventDefault={search}>
+		<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={currentSearchPhraseText}>
+	</form>
 
 	{#await searchPromise}
-		<p>Empty search result...</p>
+		<p>Searching...</p>
 	{:then}
 		{#if searchPhrase.length == 0}
 			<p>Empty search result...</p>
@@ -65,9 +72,9 @@
 		{/each}
 	</div>
 
-    {#if searchError}
+	{#if searchError}
 		<p class="error-message">Failed to publish synonyms: <br/> {searchError}</p>
-    {/if}
+	{/if}
 </div>
 
 

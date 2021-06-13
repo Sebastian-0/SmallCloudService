@@ -1,6 +1,7 @@
 
 <script lang="ts">
     import { maxSynonymLength, serviceUrl } from './Constants';
+    import { sanitizeWord } from './Utils';
 
     let word = "";
     let synonyms = [];
@@ -26,10 +27,6 @@
     function setWord() {
         word = sanitizeWord(currentWordText);
         currentWordText = "";
-    }
-
-    function sanitizeWord(word: string) {
-        return word.trim().toLowerCase();
     }
 
     function clearWord() {
