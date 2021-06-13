@@ -2,11 +2,13 @@
 <script lang="ts">
     import { maxSynonymLength, serviceUrl } from './Constants';
 
-    // let synonyms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y'];
+    let word = "";
     let synonyms = [];
 
+    let currentWordText = "";
+
     let currentSynonymText = "";
-    $: canPublish = synonyms.length > 1;
+    $: canPublish = synonyms.length > 0 && word.length > 0;
 
     let publishError = undefined;
 
@@ -16,16 +18,25 @@
 
     function addSynonym(event: Event) {
         const lowercaseText = currentSynonymText.toLowerCase();
-        if (lowercaseText.length && synonyms.indexOf(lowercaseText) == -1) {
+        if (lowercaseText.length && synonyms.indexOf(lowercaseText) === -1 && lowercaseText !== word) {
             synonyms = [...synonyms, lowercaseText];
             currentSynonymText = "";
         }
     }
 
+    function setWord() {
+        word = currentWordText.toLowerCase();
+        currentWordText = "";
+    }
+
+    function clearWord() {
+        word = "";
+    }
+
     async function publish() {
         console.log("Publish to remote: " + synonyms);
         try {
-            const response = await fetch(`${serviceUrl}/api/synonyms?word=${synonyms[0]}`, {
+            const response = await fetch(`${serviceUrl}/api/synonyms?word=${word}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,6 +45,7 @@
             });
 
             if (response.ok) {
+                word = "";
                 synonyms = [];
                 currentSynonymText = "";
                 publishError = undefined;
@@ -51,6 +63,22 @@
 
 <div>
 	<h1>Add synonyms</h1>
+    {#if word.length == 0}
+        <p>No word to publish yet...</p>
+
+        <form on:submit|preventDefault={setWord}>
+            <input type="text" placeholder="Set word" maxlength="{maxSynonymLength}" bind:value={currentWordText}>
+        </form>
+    {:else}
+        <button class="synonym word" on:click={clearWord}>
+            {word}
+
+            <div class="synonym-overlay">
+                <img src="/cross.svg" alt="Delete?" class="synonym-overlay-image">
+            </div>
+        </button>
+    {/if}
+
     <div class="list-horizontal">
         {#each synonyms as synonym, idx}
             <button class="synonym" on:click={ event => deleteSynonym(idx) }>
@@ -107,6 +135,10 @@
 
     .synonym-overlay:hover {
         opacity: 50%;
+    }
+
+    .word {
+        color: rgb(14, 118, 255);
     }
 
     .list-horizontal {
