@@ -38,4 +38,7 @@ jobs:
         
     - name: Upload package to S3
       run: aws s3 sync --delete App/public/ s3://${{ secrets.AWS_S3_WEB_APP_BUCKET }}/
+        
+    - name: Invalidate Cloudfront cache
+      run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths '/*'
    
