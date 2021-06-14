@@ -33,12 +33,33 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	}
 
 	@Test
-	void addAndGetMissingWordArgument() {
+	void addMissingWordArgument() {
 		Response response = addSynonyms("", ImmutableSet.of());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Missing 'word' argument"),
+				"Was: " + response.getStatusInfo().getReasonPhrase());
+	}
 
-		BadRequestException exception = assertThrows(BadRequestException.class, () -> getSynonyms("", 10));
-		assertTrue(exception.getMessage().contains("Missing 'word' argument"), "Was: " + exception.getMessage());
+	@Test
+	void addMissingBody() {
+		Response response = addSynonyms("a", null);
+		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Missing synonym list body"),
+				"Was: " + response.getStatusInfo().getReasonPhrase());
+
+		response = addSynonyms("a", ImmutableSet.of());
+		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Missing synonym list body"),
+				"Was: " + response.getStatusInfo().getReasonPhrase());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {" ", "", "\t", "\n"})
+	void addBadBody(String badSynonym) {
+		Response response = addSynonyms("a", ImmutableSet.of("a", "b", badSynonym));
+		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+		assertTrue(response.getStatusInfo().getReasonPhrase().contains("Body contains synonym which is null or empty"),
+				"Was: " + response.getStatusInfo().getReasonPhrase());
 	}
 
 	@Test
@@ -67,6 +88,12 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 		assertEquals(ImmutableList.of("a", "b"), synonymPage.synonyms);
 	}
 
+	@Test
+	void getMissingWordArgument() {
+		BadRequestException exception = assertThrows(BadRequestException.class, () -> getSynonyms("", 10));
+		assertTrue(exception.getMessage().contains("Missing 'word' argument"), "Was: " + exception.getMessage());
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = {-1, 0})
 	void getWithInvalidLimit(int badLimit) {
@@ -93,10 +120,14 @@ public class SynonymApiTest extends JUnit5JerseyTest {
 	}
 
 	private Response addSynonyms(String word, Set<String> synonyms) {
+		Entity<Set<String>> body = null;
+		if (synonyms != null) {
+			body = Entity.json(synonyms);
+		}
 		return target().path("synonyms")
 						.queryParam("word", word)
 						.request()
-						.post(Entity.json(synonyms));
+						.post(body);
 	}
 
 	private SynonymPage getSynonyms(String word, int limit) {

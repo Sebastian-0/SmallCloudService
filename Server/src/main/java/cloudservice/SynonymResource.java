@@ -24,6 +24,15 @@ public class SynonymResource {
 		if (word == null || word.isBlank()) {
 			throw new BadRequestException("Missing 'word' argument");
 		}
+		if (synonyms == null || synonyms.isEmpty()) {
+			throw new BadRequestException("Missing synonym list body");
+		}
+		for (String synonym : synonyms) {
+			if (synonym == null || synonym.isBlank()) {
+				throw new BadRequestException("Body contains synonym which is null or empty");
+			}
+		}
+
 		database.addSynonyms(word, synonyms);
 	}
 
