@@ -119,6 +119,7 @@ public class LoadTests {
 		try (Response response = client.target(HOST)
 				.path("/api/synonyms")
 				.queryParam("word", a)
+				.queryParam("limit", 100)
 				.request()
 				.get()) {
 			if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
