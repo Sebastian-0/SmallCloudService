@@ -28,7 +28,9 @@
 	function setWord() {
 		word = sanitizeWord(currentWordText);
 		currentWordText = "";
-		synonymInputField.focus();
+		if (word.length > 0) {
+			synonymInputField.focus();
+		}
 	}
 
 	function clearWord() {
@@ -69,7 +71,8 @@
 		<p>No word to publish yet...</p>
 
 		<form on:submit|preventDefault={setWord}>
-			<input type="text" placeholder="Set word" maxlength="{maxSynonymLength}" bind:value={currentWordText}>
+			<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={currentWordText}>
+			<button class="small-button" on:click={setWord}>Set word</button>
 		</form>
 	{:else}
 		<button class="synonym word" on:click={clearWord}>
@@ -98,7 +101,8 @@
 	</div>
 
 	<form on:submit|preventDefault={addSynonym}>
-		<input type="text" placeholder="Add synonym" maxlength="{maxSynonymLength}" bind:value={currentSynonymText} bind:this={synonymInputField}>
+		<input type="text" placeholder="Enter a synonym" maxlength="{maxSynonymLength}" bind:value={currentSynonymText} bind:this={synonymInputField}>
+		<button class="small-button" on:click={addSynonym}>Add synonym</button>
 	</form>
 
 	<button on:click={publish} disabled={!canPublish}>
