@@ -22,7 +22,7 @@ public class SynonymResource {
 	@POST
 	public void add(@QueryParam("word") String word, Set<String> synonyms) {
 		if (word == null || word.isBlank()) {
-			throw new BadRequestException("Missing word argument");
+			throw new BadRequestException("Missing 'word' argument");
 		}
 		database.addSynonyms(word, synonyms);
 	}
