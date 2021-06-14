@@ -13,6 +13,34 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * This class stores all the synonyms in memory. Updates are implemented using Union-Find to make them go faster since
+ * we are only interested in adding synonyms. To support removals as well we would need to redesign.
+ * <br/>
+ * <br/>The main priority is to make queries fast, so it's important that we pre-compute as much as possible, and that we use
+ * a good locking mechanism.
+ * <br/>
+ * <br/>To do some benchmarking I added 300k synonyms using 10 workers (see <code>LoadTest</code>}, and then ran 100k
+ * modifications/queries as quickly as possible in three separate tests. In this test all synonyms are connected by
+ * transitivity since that is the worst case we need to handle.
+ * <ul>
+ *     <li>When testing modifications, response time for adding synonyms went from 40ms to 330ms during the test (as
+ *     more synonyms were added). Part of this time is merging the synonym lists in the database and part of it is
+ *     contention for the lock since only 1 of 10 workers can have access at a time.</li>
+ *     <li>When testing queries, response time for querying synonyms was consistently sub 0.3ms during the test (with
+ *     300k synonyms in the database)</li>
+ *     <li>When testing both modifications and queries at the same time, response time for querying synonyms was above
+ *     100ms throughout the test, which isn't surprising since the modifications lock the database a lot of the time.</li>
+ * </ul>
+ * <br/>My conclusion is that this is good enough performance if this is what the final system should look like. The
+ * worst case is when there is a heavy load with both queries and modifications at the same time but realistically I
+ * think that scenario is unlikely.
+ * <br/>
+ * <br/>We could improve performance in the last test by having two versions of the database,
+ * one live and one that is being modified, and then just swapping them when we are done, then I think we would have
+ * vastly better response times for queries. We could also use binary search when merging the synonym lists to speed up
+ * the modification queries as well.
+ */
 public class Database {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Lock readLock = lock.readLock();
@@ -20,6 +48,9 @@ public class Database {
 
 	private final Map<String, Node> wordToNode = new LinkedHashMap<>();
 
+	/**
+	 * Add new synonyms, this method will lock the database from reads during the operation.
+	 */
 	public void addSynonyms(String word, Set<String> synonyms) {
 		writeLock.lock();
 		try {
@@ -37,6 +68,10 @@ public class Database {
 		return wordToNode.computeIfAbsent(word, k -> new Node(word));
 	}
 
+	/**
+	 * Returns the synonyms of the specified word, limited to at most the specified limit amount of results. The total
+	 * count is also returned as part of the result.
+	 */
 	public SynonymPage getSynonyms(String word, int limit) {
 		readLock.lock();
 		try {
@@ -55,7 +90,7 @@ public class Database {
 					result.add(synonym);
 				}
 			}
-			return new SynonymPage(allSynonyms.size() - 1, result);
+			return new SynonymPage(allSynonyms.size() - 1, result); // Remove one since 'word' is included
 		} finally {
 			readLock.unlock();
 		}

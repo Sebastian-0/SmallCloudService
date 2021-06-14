@@ -39,6 +39,9 @@ public class CloudServer {
 		}));
 	}
 
+	/**
+	 * Returns the port to use, in AWS Elastic Beanstalk the port is configured as an environment variable.
+	 */
 	private int getPort() {
 		return Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 	}
