@@ -34,10 +34,12 @@
 					const text = await response.text();
 					console.error("Unexpected error when searching: " + text);
 					searchError = response.statusText + " (see the log for details)";
+					searchResult = new SynonymPage();
 				}
 			} catch (error) {
 				console.error("Unexpected error when searching: " + error.message);
 				searchError = "Service unavailable (see the log for details)";
+				searchResult = new SynonymPage();
 			}
 		} else {
 			searchError = undefined;
@@ -45,14 +47,10 @@
 		}
 	}
 
-	function search() {
-		const sanitized = sanitizeWord(currentSearchPhraseText);
-		if (sanitized !== searchPhrase) {
-			pageLimit = 100;
-			searchPhrase = sanitized;
-			searchResult = new SynonymPage();
-			searchPromise = doSearch();
-		}
+	function searchPhraseChanged() {
+		pageLimit = 100;
+		searchPhrase = sanitizeWord(currentSearchPhraseText);
+		searchPromise = doSearch();
 	}
 
 	function increaseLimit() {
@@ -65,9 +63,7 @@
 <div>
 	<h1>View synonyms</h1>
 
-	<form on:submit|preventDefault={search}>
-		<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={currentSearchPhraseText}>
-	</form>
+	<input type="text" placeholder="Enter a word" maxlength="{maxSynonymLength}" bind:value={currentSearchPhraseText} on:input={searchPhraseChanged}>
 
 	{#await searchPromise}
 		<p>Searching...</p>
