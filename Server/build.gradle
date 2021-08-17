@@ -43,19 +43,12 @@ task copyProcfile( type: Copy ) {
     from "Procfile"
 }
 
-task copyElasticBeanstalkConfigs( type: Copy ) {
-    into "$buildDir/libs"
-    from(".") {
-        include ".ebextensions/**"
-    }
-}
-
 jar {
     manifest {
         attributes 'Main-Class':'cloudservice.CloudServer',
                 'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
-    dependsOn copyToLib, copyProcfile, copyElasticBeanstalkConfigs
+    dependsOn copyToLib, copyProcfile
 }
 
 task packageDistibution(type: Zip) {
