@@ -1,0 +1,26 @@
+
+Web resources:
+--------------
+Google fonts: https://fonts.google.com/specimen/Stint+Ultra+Condensed
+
+W3 schools HTML/CSS tags: https://www.w3schools.com/tags/tag_label.asp
+
+Mozilla dev. network pages: https://developer.mozilla.org/en-US/docs/Web/CSS
+
+Which browsers support my features: https://caniuse.com/?search=XMLHttpRequest
+
+Svelte:
+- Svelte vs. React: https://javascript.plainenglish.io/i-created-the-exact-same-app-in-react-and-svelte-here-are-the-differences-c0bd2cc9b3f8
+- Svelte docs: https://svelte.dev/tutorial/basics
+
+Backend resources:
+------------------
+Jetty docs: https://www.eclipse.org/jetty/documentation/jetty-11/programming-guide/index.html#pg-server-http-connector-protocol-http2
+Jersey docs: https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest3x/user-guide.html#test-framework
+
+
+Dev-ops resources:
+------------------
+Deploying an web app to AWS:
+- Host simple static website: https://www.youtube.com/watch?v=D6qB7MEFOe0
+- Host React/Vue/Angular website: https://www.youtube.com/watch?v=f20XOaQ3JDA
